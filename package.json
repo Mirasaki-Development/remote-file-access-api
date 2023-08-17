@@ -19,7 +19,7 @@
     "commit": "cz",
     "docker:build": "docker build --tag remote-file-access-api .",
     "docker:shell": "docker run -it --rm remote-file-access-api sh",
-    "docker:start": "docker run -it -p 9000:9000 --env-file ./.env -d --name remote-file-access-api remote-file-access-api",
+    "docker:start": "docker run -it -p 9000:9000 -d --name remote-file-access-api remote-file-access-api",
     "docker:restart": "docker restart remote-file-access-api",
     "docker:stop": "docker stop remote-file-access-api",
     "docker:kill": "docker rm -f remote-file-access-api",

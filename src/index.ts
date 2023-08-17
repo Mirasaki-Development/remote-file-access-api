@@ -4,7 +4,7 @@ import compression from 'compression';
 import bodyParser from 'body-parser';
 
 import { validateConfig } from '../config/internal/validate';
-import { config, remoteFileOptions } from './config';
+import { config, allRouteOptions } from './config';
 import { apiErrorHandler, pageNotFound } from './modules/api-errors';
 import { requireAPIKey } from './modules/auth';
 import { setRequestId, transformJSONResponse } from './modules/json-response';
@@ -53,7 +53,7 @@ export const main = () => {
   app.get(
     '/options',
     (req, res) => res.json({
-      data: remoteFileOptions
+      data: allRouteOptions
     })
   );
 

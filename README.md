@@ -4,7 +4,6 @@
 
 [![CodeFactor](https://www.codefactor.io/repository/github/Mirasaki/remote-file-access-api/badge)](https://www.codefactor.io/repository/github/Mirasaki/remote-file-access-api)
 ![GitHub](https://img.shields.io/github/license/Mirasaki/remote-file-access-api)
-![Docker Pulls](https://img.shields.io/docker/pulls/Mirasaki/remote-file-access-api)
 ![version](https://img.shields.io/github/v/release/Mirasaki/remote-file-access-api)
 
 </div>

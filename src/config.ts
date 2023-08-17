@@ -10,5 +10,5 @@ export const remoteDBOptions = config.REMOTE_JSON_DATABASES.map((jdb) => `/json/
 
 export const allRouteOptions = [
   ...remoteFileOptions,
-  ...remoteFileOptions
+  ...remoteDBOptions
 ];

@@ -17,6 +17,7 @@ import {
   patchJSONDataController,
   putJSONDataController
 } from './modules/json-database/controller';
+import { getRemoteDirectoryController } from './modules/remote-files/getRemoteDirectory';
 
 // Initialize our express app
 const app = express();
@@ -59,6 +60,9 @@ export const main = () => {
 
   // Register all our remote file access endpoints
   app.get('/files/:name', getRemoteFileController);
+
+  // Register all our remote directory access endpoints
+  app.get('/directories/:name', getRemoteDirectoryController);
 
   // Register our JSON databases - yay!
   app.get('/json/:name', getAllJSONDataController);

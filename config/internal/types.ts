@@ -11,6 +11,7 @@ export interface RequiredUserConfig {
   API_KEY: string;
   /** File configuration to allow remote access to files */
   REMOTE_FILES: RemoteFileAccess[];
+  REMOTE_DIRECTORIES: RemoteDirectoryAccess[];
   /** JSON database configuration, allows remote management of local JSON data */
   REMOTE_JSON_DATABASES: JsonDatabase[];
   /**
@@ -57,6 +58,18 @@ export interface RemoteFileAccess {
    * - Only allows files of provided extension when looking for most recent file otherwise
    */
   EXTENSION?: string | null;
+}
+
+export interface RemoteDirectoryAccess {
+  /** The name for this remote access content, should be unique */
+  NAME: string;
+  /**
+   * The absolute path to the directory that should be accessed remotely.
+   * Escape paths on Windows: `C:\\Users\\OmegaManager\\servers\\0\\profiles`
+   */
+  DIRECTORY: string;
+  /** Whitelisted file extensions - everything is whitelisted if empty or null */
+  EXTENSIONS?: string[] | null;
 }
 
 export interface JsonDatabase {

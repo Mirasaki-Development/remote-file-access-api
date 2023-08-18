@@ -9,7 +9,7 @@
 </div>
 
 <p align="center">
-  Allows remote access to local files and JSON databases through a simple configuration file. Minimal set-up, maximum configuration and extendibility.
+  Allows remote access to local files, directories and JSON databases through a simple configuration file. Minimal set-up, maximum configuration and extendibility.
 </p>
 
 <br />

@@ -81,6 +81,19 @@ export const validateConfig = () => {
     }
   }
 
+  // Validate all our remote directory access configs
+  for (const rdCfg of mergedConfig.REMOTE_DIRECTORIES) {
+    const normalizedPath = path.normalize(rdCfg.DIRECTORY);
+
+    // Always required valid DIRECTORY
+    if (!existsSync(normalizedPath)) {
+      console.error(stripIndents`
+        [Configuration - REMOTE_DIRECTORIES] "DIRECTORY" path does not exist (${rdCfg.DIRECTORY})
+      `);
+      process.exit(1);
+    }
+  }
+
   // Validate all JSON database configs
   for (const jsonDbCfg of mergedConfig.REMOTE_JSON_DATABASES) {
     const normalizedPath = path.normalize(jsonDbCfg.DIRECTORY);

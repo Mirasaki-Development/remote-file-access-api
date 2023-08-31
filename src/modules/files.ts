@@ -23,14 +23,15 @@ export const getRawFileContents = async (
 
 export const findNewestFile = async (
   directoryPath: string,
-  skipN = 0
+  skipN = 0,
+  extension?: string | null
 ): Promise<string | null> => {
   try {
     const files = await readdir(directoryPath);
     if (files.length === 0) return null;
 
     // Sort files by creation time (ctimeMs) in descending order
-    const sortedFiles = await Promise.all(
+    let sortedFiles = await Promise.all(
       files.map(async (file) => {
         const filePath = path.join(directoryPath, file);
         const fileStat = await stat(filePath);
@@ -38,8 +39,15 @@ export const findNewestFile = async (
       })
     );
 
-    // Sort by creation date
-    sortedFiles.sort((a, b) => b.ctimeMs - a.ctimeMs);
+    // Can't continue
+    if (!sortedFiles) return null;
+
+    // Resolve workable files
+    sortedFiles = sortedFiles
+      // Filter whitelisted files
+      .filter((e) => typeof extension === 'undefined' || e.filePath.endsWith(extension))
+      // Sort by creation date
+      .sort((a, b) => b.ctimeMs - a.ctimeMs);
 
     // If there are fewer files than skipN, return null
     if (sortedFiles.length <= skipN) return null;

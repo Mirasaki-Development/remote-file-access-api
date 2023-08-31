@@ -36,7 +36,7 @@ export const getRemoteAccessContent = async (cfg: RemoteFileAccess) => {
 
   for (let i = 0; i < useLatestFiles; i++) {
     // Resolve latest files
-    const latestFile = await findNewestFile(cfg.DIRECTORY, i);
+    const latestFile = await findNewestFile(cfg.DIRECTORY, i, cfg.EXTENSION);
     if (latestFile === null) break;
 
     // Resolve workable path

@@ -1,5 +1,5 @@
 import { RemoteFileAccess } from '../../../config/internal/types';
-import { findNewestFile, getLatestLines } from '../files';
+import { findNewestFile, getLatestLines, getRawFileContents } from '../files';
 import path from 'path';
 import { NextFunction, Request, Response } from 'express';
 import config from '../../config';
@@ -33,5 +33,7 @@ export const getRemoteAccessContent = async (cfg: RemoteFileAccess) => {
     : `${await findNewestFile(cfg.DIRECTORY)}`
   );
   if (normalizedPath.endsWith('null')) return null;
-  return await getLatestLines(normalizedPath, { linesToRetrieve: cfg.USE_LATEST_LINES });
+
+  if (!cfg.SPLIT) return await getRawFileContents(normalizedPath);
+  else return await getLatestLines(normalizedPath, { linesToRetrieve: cfg.USE_LATEST_LINES });
 };

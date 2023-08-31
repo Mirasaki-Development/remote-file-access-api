@@ -58,6 +58,11 @@ export interface RemoteFileAccess {
    * - Only allows files of provided extension when looking for most recent file otherwise
    */
   EXTENSION?: string | null;
+  /**
+   * Should the response be an array of split lines, or the raw file output
+   * @default true
+   */
+  SPLIT?: boolean;
 }
 
 export interface RemoteDirectoryAccess {

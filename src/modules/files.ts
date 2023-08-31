@@ -17,6 +17,10 @@ export const getLatestLines = async (
     .reverse();
 };
 
+export const getRawFileContents = async (
+  filePath: string
+): Promise<string> => await readFile(filePath, { encoding: 'utf8' })
+
 export const findNewestFile = async (directoryPath: string): Promise<string | null> => {
   try {
     const files = await readdir(directoryPath);

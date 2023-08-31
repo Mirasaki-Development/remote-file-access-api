@@ -28,12 +28,32 @@ export const getRemoteFileController = async (
  * before this function is reached
  */
 export const getRemoteAccessContent = async (cfg: RemoteFileAccess) => {
-  const normalizedPath = path.normalize(cfg.FILE_NAME
-    ? `${cfg.DIRECTORY}/${cfg.FILE_NAME}`
-    : `${await findNewestFile(cfg.DIRECTORY)}`
-  );
-  if (normalizedPath.endsWith('null')) return null;
+  // Declarations
+  const res = [];
+  let useLatestFiles = 1;
+  if (cfg.USE_LATEST_FILES && cfg.USE_LATEST_FILES >= 1) useLatestFiles = cfg.USE_LATEST_FILES;
 
-  if (!cfg.SPLIT) return await getRawFileContents(normalizedPath);
-  else return await getLatestLines(normalizedPath, { linesToRetrieve: cfg.USE_LATEST_LINES });
+
+  for (let i = 0; i < useLatestFiles; i++) {
+    // Resolve latest files
+    const latestFile = await findNewestFile(cfg.DIRECTORY, i);
+    if (latestFile === null) break;
+
+    // Resolve workable path
+    const normalizedPath = path.normalize(cfg.FILE_NAME
+      ? `${cfg.DIRECTORY}/${cfg.FILE_NAME}`
+      : `${latestFile}`
+    );
+
+    // Check how data should be returned
+    if (cfg.SPLIT === false) res.push(await getRawFileContents(normalizedPath));
+    else res.push(await getLatestLines(normalizedPath, { linesToRetrieve: cfg.USE_LATEST_LINES }));
+  }
+
+  // Flatten array based on configuration
+  return res.flat(
+    cfg.JOIN_LATEST_FILES === false
+      ? 0
+      : 1
+  );
 };

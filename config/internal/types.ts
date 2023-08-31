@@ -63,6 +63,21 @@ export interface RemoteFileAccess {
    * @default true
    */
   SPLIT?: boolean;
+  /**
+   * The amount of files to include in the response
+   * 
+   * - 1 by default, only latest file match will be used
+   * - Useful if you have small log files, and want to include
+   * a bit more in your working data
+   */
+  USE_LATEST_FILES?: number | null;
+  /**
+   * If {@link USE_LATEST_FILES} is used, and higher than 1, should the
+   * multiple files be concatenated into 1 array response, or - when `false` -
+   * return an array for every file entry
+   * @default true
+   */
+  JOIN_LATEST_FILES?: boolean;
 }
 
 export interface RemoteDirectoryAccess {

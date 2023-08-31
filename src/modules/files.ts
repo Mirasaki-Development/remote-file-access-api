@@ -17,24 +17,35 @@ export const getLatestLines = async (
     .reverse();
 };
 
-export const findNewestFile = async (directoryPath: string): Promise<string | null> => {
+export const getRawFileContents = async (
+  filePath: string
+): Promise<string> => await readFile(filePath, { encoding: 'utf8' });
+
+export const findNewestFile = async (
+  directoryPath: string,
+  skipN = 0
+): Promise<string | null> => {
   try {
     const files = await readdir(directoryPath);
     if (files.length === 0) return null;
 
-    let newestFile: string | null = null;
-    let newestTimestamp = 0;
+    // Sort files by creation time (ctimeMs) in descending order
+    const sortedFiles = await Promise.all(
+      files.map(async (file) => {
+        const filePath = path.join(directoryPath, file);
+        const fileStat = await stat(filePath);
+        return { filePath, ctimeMs: fileStat.ctimeMs };
+      })
+    );
 
-    for (const file of files) {
-      const filePath = path.join(directoryPath, file);
-      const fileStat = await stat(filePath);
-      if (fileStat.isFile() && fileStat.ctimeMs > newestTimestamp) {
-        newestFile = filePath;
-        newestTimestamp = fileStat.ctimeMs;
-      }
-    }
+    // Sort by creation date
+    sortedFiles.sort((a, b) => b.ctimeMs - a.ctimeMs);
 
-    return newestFile;
+    // If there are fewer files than skipN, return null
+    if (sortedFiles.length <= skipN) return null;
+
+    // Return the path of the (skipN + 1)-th newest file
+    return sortedFiles[skipN].filePath;
   } catch (error) {
     throw new Error(`Error finding newest file: ${error.message}`);
   }

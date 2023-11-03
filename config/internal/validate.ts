@@ -23,13 +23,13 @@ export const validateConfig = () => {
   }
 
   // Exit if there's nothing to do/no files to serve
-  if ((mergedConfig.REMOTE_FILES?.length ?? 0) < 1) {
-    console.error([
-      '[Configuration] "REMOTE_FILES" should have at least 1 element',
-      '  ↳ Exiting as there\'s nothing to do/no files to serve...'
-    ].join('\n'));
-    process.exit(1);
-  }
+  // if ((mergedConfig.REMOTE_FILES?.length ?? 0) < 1) {
+  //   console.error([
+  //     '[Configuration] "REMOTE_FILES" should have at least 1 element',
+  //     '  ↳ Exiting as there\'s nothing to do/no files to serve...'
+  //   ].join('\n'));
+  //   process.exit(1);
+  // }
 
   // Make sure we have a workable port
   if (

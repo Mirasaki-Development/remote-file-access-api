@@ -1,8 +1,8 @@
 {
   "name": "remote-file-access-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Allows remote access to local files, directories and JSON databases through a simple configuration file. Minimal set-up, maximum configuration and extendibility",
+  "main": "dist/src/index.js",
   "scripts": {
     "clean:dist": "rimraf ./dist",
     "clean:modules": "rimraf ./node_modules",

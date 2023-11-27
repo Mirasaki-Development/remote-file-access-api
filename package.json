@@ -1,6 +1,6 @@
 {
   "name": "remote-file-access-api",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Allows remote access to local files, directories and JSON databases through a simple configuration file. Minimal set-up, maximum configuration and extendibility",
   "main": "dist/src/index.js",
   "scripts": {

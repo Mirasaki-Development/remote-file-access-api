@@ -4,6 +4,7 @@ import path from 'path';
 import { NextFunction, Request, Response } from 'express';
 import config from '../../config';
 import { resourceNotFound } from '../api-errors';
+import { debugLog } from '../../debug';
 
 export const getRemoteFileController = async (
   req: Request,
@@ -20,6 +21,7 @@ export const getRemoteFileController = async (
 
   // Send the contents
   const fileContents = await getRemoteAccessContent(cfg);
+  debugLog(`Sending remote file ${name} with ${fileContents.length} lines`);
   res.json({ data: fileContents });
 };
 
@@ -44,6 +46,8 @@ export const getRemoteAccessContent = async (cfg: RemoteFileAccess) => {
       ? `${cfg.DIRECTORY}/${cfg.FILE_NAME}`
       : `${latestFile}`
     );
+
+    debugLog(`Resolved remote file for ${cfg.NAME} to ${normalizedPath}`);
 
     // Check how data should be returned
     if (cfg.SPLIT === false) res.push(await getRawFileContents(normalizedPath));

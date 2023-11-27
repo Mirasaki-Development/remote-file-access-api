@@ -4,6 +4,7 @@ export const EPHEMERAL_PORT_RANGE_START = 49152;
 export const EPHEMERAL_PORT_RANGE_END = VALID_PORT_RANGE_MAX;
 
 export const RECOMMENDED_API_KEY_LENGTH = 128;
+export const MS_IN_ONE_NS = 1000000;
 
 /**
  * Represents key-value pairs of otherwise ambiguous random numbers
@@ -13,7 +14,8 @@ const magic = {
   VALID_PORT_RANGE_MAX,
   EPHEMERAL_PORT_RANGE_START,
   EPHEMERAL_PORT_RANGE_END,
-  RECOMMENDED_API_KEY_LENGTH
+  RECOMMENDED_API_KEY_LENGTH,
+  MS_IN_ONE_NS
 };
 
 export default magic;

@@ -1,8 +1,10 @@
 import { readFileSync, writeFileSync, rmSync } from 'fs';
 import { getFiles } from '../files';
+import { debugLog } from '../../debug';
 
 export const getAllJSONFiles = (targetPath: string) => {
   const allJSONFiles = getFiles(targetPath, [ '.json' ]);
+  debugLog(`Found ${allJSONFiles.length} JSON files in ${targetPath}`);
   return allJSONFiles
     .map((pathToJSON) => {
       const textData = readFileSync(pathToJSON, { encoding: 'utf-8' });
@@ -20,6 +22,7 @@ export const getAllJSONFiles = (targetPath: string) => {
 
 export const getJSONFile = (targetPath: string, identifier: string) => {
   const finalPath = targetPath + `/${ identifier }.json`;
+  debugLog(`Attempting to get JSON file from ${finalPath}`);
   try {
     const textData = readFileSync(finalPath, { encoding: 'utf-8' });
     return JSON.parse(textData);
@@ -37,6 +40,7 @@ export const putJSONFile = (
   newJSONContent: unknown
 ) => {
   const finalPath = targetPath + `/${ identifier }.json`;
+  debugLog(`Attempting to put JSON file to ${finalPath}`);
   try {
     writeFileSync(
       finalPath,

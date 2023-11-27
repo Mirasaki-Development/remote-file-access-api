@@ -1,6 +1,7 @@
 import { readdirSync, statSync } from 'fs';
 import { readdir, readFile, stat } from 'fs/promises';
 import path from 'path';
+import { debugLog } from '../debug';
 
 export interface LatestLinesOptions {
   linesToRetrieve?: number;
@@ -53,6 +54,9 @@ export const findNewestFile = async (
     if (sortedFiles.length <= skipN) return null;
 
     // Return the path of the (skipN + 1)-th newest file
+    debugLog(`Found ${sortedFiles.length} files in ${directoryPath}, returning ${
+      sortedFiles[skipN].filePath
+    } as the ${skipN + 1}-th newest file${extension ? ` with extension ${extension}` : ''}`);
     return sortedFiles[skipN].filePath;
   } catch (error) {
     throw new Error(`Error finding newest file: ${error.message}`);
@@ -86,5 +90,7 @@ export const getFiles = (
       ).startsWith('.')
     ) res.push(itemInDir);
   }
+
+  debugLog(`Resolved files for ${requestedPath}:`, res);
   return res;
 };

@@ -1,5 +1,6 @@
 import { id } from 'cls-rtracer';
 import { NextFunction, Request, Response } from 'express';
+import { debugLog } from '../debug';
 
 /** Assign every request a unique id */
 export const setRequestId = (
@@ -9,6 +10,7 @@ export const setRequestId = (
 ) => {
   res.locals.rid = id();
   next();
+  debugLog('Assigned Request ID:', res.locals.rid);
 };
 
 /** Transform our `res#json` function and include persistent properties */

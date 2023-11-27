@@ -1,5 +1,6 @@
 import { RateLimiterMemory } from 'rate-limiter-flexible';
 import { tooManyRequestsError } from './api-errors';
+import { debugLog } from '../debug';
 
 /**
  * Block Strategy against really powerful DDoS attacks (like 100k requests per sec)
@@ -28,6 +29,7 @@ const rateLimiterMiddleware = (limiter) => {
         };
         res.set(rlHeaders);
         next();
+        debugLog('Rate limit headers for IP:', rlHeaders);
       })
       .catch(({
         remainingPoints,
@@ -51,6 +53,7 @@ const rateLimiterMiddleware = (limiter) => {
           message: error.message,
           ...error.body
         });
+        debugLog('Rate limit reached for IP:', rlHeaders);
         return;
       });
   };

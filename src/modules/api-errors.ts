@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { debugLog } from '../debug';
 
 export const UNAUTHORIZED_ERROR = 'UNAUTHORIZED';
 export const RESOURCE_NOT_FOUND_ERROR = 'RESOURCE_NOT_FOUND';
@@ -26,6 +27,7 @@ export class ApiError {
     this.error = error;
     this.message = message;
     this.body = body ?? {};
+    debugLog(`ApiError constructed: ${this.error} - ${this.message}`);
   }
 }
 

@@ -3,6 +3,7 @@ import config from '../../config';
 import { resourceNotFound } from '../api-errors';
 import { readdirSync, createReadStream } from 'fs';
 import archiver from 'archiver'; // Import archiver for creating zip files
+import { debugLog } from '../../debug';
 
 export const getRemoteDirectoryController = async (
   req: Request,
@@ -23,6 +24,7 @@ export const getRemoteDirectoryController = async (
   // If not null or empty array, only allows these whitelisted string[] file extensions
   const allowedExtensions = cfg.EXTENSIONS;
 
+  debugLog(`Attempting to stream remote directory ${name} from ${dirPath}`);
   try {
     // Set appropriate header
     res.setHeader('Content-Type', 'application/zip');
@@ -54,11 +56,14 @@ export const compressAndAddFilesToArchive = async (
           : true
       );
 
+    debugLog(`Found ${items.length} items in ${directoryPath} to archive`);
     for (const item of items) {
       const itemPath = `${directoryPath}/${item.name}`;
       if (item.isDirectory()) {
+        debugLog(`Adding directory ${itemPath} to zip archive`);
         await processDirectory(itemPath); // Recursively process subdirectories
       } else if (item.isFile()) {
+        debugLog(`Adding file ${itemPath} to zip archive`);
         archive.append(createReadStream(itemPath), { name: item.name }); // Add file to the zip archive
       }
     }

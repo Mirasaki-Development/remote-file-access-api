@@ -12,7 +12,7 @@ export const requireAPIKey = (
 ) => {
   const apiKeyHeader = req.headers[X_API_KEY];
   if (!apiKeyHeader || apiKeyHeader !== config.API_KEY) {
-    next(unauthorized);
+    next(unauthorized());
     debugLog(`API key for request ${res.locals.rid} is invalid`);
     return;
   }

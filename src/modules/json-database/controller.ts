@@ -17,7 +17,7 @@ export const getAllJSONDataController = async (
   }
 
   // Resolve data
-  const allJSONData = getAllJSONFiles(cfg.DIRECTORY);
+  const allJSONData = await getAllJSONFiles(cfg.DIRECTORY);
 
   // Don't handle error (empty),
   // provide empty array for null fallback
@@ -41,7 +41,7 @@ export const getJSONDataController = async (
 
   // Resolve data
   const { identifier } = req.params;
-  const jsonData = getJSONFile(cfg.DIRECTORY, identifier);
+  const jsonData = await getJSONFile(cfg.DIRECTORY, identifier);
 
   // Handle errors
   if (jsonData === null) {
@@ -68,7 +68,7 @@ export const deleteJsonDataController = async (
 
   // Resolve data
   const { identifier } = req.params;
-  const jsonData = getJSONFile(cfg.DIRECTORY, identifier);
+  const jsonData = await getJSONFile(cfg.DIRECTORY, identifier);
 
   // Handle errors
   if (jsonData === null) {
@@ -77,7 +77,7 @@ export const deleteJsonDataController = async (
   }
 
   // Delete the file/data
-  deleteJSONFile(cfg.DIRECTORY, identifier);
+  await deleteJSONFile(cfg.DIRECTORY, identifier);
 
   // Ok, send the response
   res.json({ data: jsonData });
@@ -99,7 +99,7 @@ export const putJSONDataController = async (
   // Resolve data
   const { identifier } = req.params;
   const newJSONContent = req.body;
-  const response = putJSONFile(cfg.DIRECTORY, identifier, newJSONContent);
+  const response = await putJSONFile(cfg.DIRECTORY, identifier, newJSONContent);
 
   // Handle errors - target to overwrite doesn't exist
   if (response === null) {
@@ -127,7 +127,7 @@ export const patchJSONDataController = async (
   // Resolve data
   const { identifier } = req.params;
   const updatedJSONFields = req.body;
-  const jsonData = getJSONFile(cfg.DIRECTORY, identifier);
+  const jsonData = await getJSONFile(cfg.DIRECTORY, identifier);
   if (!jsonData) {
     next(resourceNotFound(`JSON_DATABASE(${name})-${identifier}`));
     return;
@@ -139,7 +139,7 @@ export const patchJSONDataController = async (
   }
 
   // Reflect in file - can't 404
-  putJSONFile(cfg.DIRECTORY, identifier, jsonData);
+  await putJSONFile(cfg.DIRECTORY, identifier, jsonData);
 
   // Ok, send the response
   res.json({ data: jsonData });

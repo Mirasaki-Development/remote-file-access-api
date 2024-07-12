@@ -1,6 +1,6 @@
 import { RemoteFileAccess } from '../../../config/internal/types';
 import { findNewestFile, getLatestLines, getRawFileContents } from '../files';
-import path from 'path';
+import path, { join } from 'path';
 import { NextFunction, Request, Response } from 'express';
 import config from '../../config';
 import { resourceNotFound } from '../api-errors';
@@ -43,7 +43,7 @@ export const getRemoteAccessContent = async (cfg: RemoteFileAccess) => {
 
     // Resolve workable path
     const normalizedPath = path.normalize(cfg.FILE_NAME
-      ? `${cfg.DIRECTORY}/${cfg.FILE_NAME}`
+      ? join(cfg.DIRECTORY, cfg.FILE_NAME)
       : `${latestFile}`
     );
 

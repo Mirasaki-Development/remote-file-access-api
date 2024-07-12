@@ -1,6 +1,7 @@
 import { getFiles } from '../files';
 import { debugLog } from '../../debug';
 import { rm, writeFile, readFile } from 'fs/promises';
+import { join } from 'path';
 
 export const getAllJSONFiles = async (targetPath: string) => {
   const allJSONFiles = getFiles(targetPath, [ '.json' ]);
@@ -22,7 +23,7 @@ export const getAllJSONFiles = async (targetPath: string) => {
 };
 
 export const getJSONFile = async (targetPath: string, identifier: string) => {
-  const finalPath = targetPath + `/${ identifier }.json`;
+  const finalPath = join(targetPath, `${ identifier }.json`);
   debugLog(`Attempting to get JSON file from ${finalPath}`);
   try {
     const textData = await readFile(finalPath, { encoding: 'utf-8' });
@@ -41,7 +42,7 @@ export const putJSONFile = async (
   identifier: string,
   newJSONContent: unknown
 ) => {
-  const finalPath = targetPath + `/${ identifier }.json`;
+  const finalPath = join(targetPath, `${ identifier }.json`);
   debugLog(`Attempting to put JSON file to ${finalPath}`);
   try {
     await writeFile(
@@ -60,7 +61,7 @@ export const putJSONFile = async (
 };
 
 export const deleteJSONFile = async (targetPath: string, identifier: string) => {
-  const finalPath = targetPath + `/${ identifier }.json`;
+  const finalPath = join(targetPath, `${ identifier }.json`);
   debugLog(`Attempting to delete JSON file at ${finalPath}`);
   try {
     await rm(finalPath, { recursive: false, force: false });

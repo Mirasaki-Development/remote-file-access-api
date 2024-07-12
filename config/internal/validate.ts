@@ -71,7 +71,7 @@ export const validateConfig = () => {
 
     // Required valid file name if provided
     if (rfCfg.FILE_NAME) {
-      const filePath = path.normalize(`${normalizedPath}/${rfCfg.FILE_NAME}`);
+      const filePath = path.join(normalizedPath, rfCfg.FILE_NAME);
       if (!existsSync(filePath)) {
         console.error(stripIndents`
           [Configuration - REMOTE_FILES] "FILE_NAME" path does not exist (${filePath})

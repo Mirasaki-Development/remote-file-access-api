@@ -4,6 +4,7 @@ import { resourceNotFound } from '../api-errors';
 import { readdirSync, createReadStream } from 'fs';
 import archiver from 'archiver'; // Import archiver for creating zip files
 import { debugLog } from '../../debug';
+import { join } from 'path';
 
 export const getRemoteDirectoryController = async (
   req: Request,
@@ -58,7 +59,7 @@ export const compressAndAddFilesToArchive = async (
 
     debugLog(`Found ${items.length} items in ${directoryPath} to archive`);
     for (const item of items) {
-      const itemPath = `${directoryPath}/${item.name}`;
+      const itemPath = join(directoryPath, item.name);
       if (item.isDirectory()) {
         debugLog(`Adding directory ${itemPath} to zip archive`);
         await processDirectory(itemPath); // Recursively process subdirectories

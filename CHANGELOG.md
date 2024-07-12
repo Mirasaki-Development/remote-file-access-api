@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/Mirasaki/remote-file-access-api/compare/v1.1.1...v1.1.2) (2024-07-12)
+
+
+### Bug Fixes
+
+* improve path resolution by using path#join instead of / ([e2f6513](https://github.com/Mirasaki/remote-file-access-api/commit/e2f6513272151d67e3e787809775f8870cda7fe9))
+
 # [1.1.0](https://github.com/Mirasaki/remote-file-access-api/compare/v1.0.4...v1.1.0) (2023-11-27)
 
 

@@ -1,0 +1,45 @@
+api-key: "__REPLACE_THIS_WITH_A_STRONG_API_KEY"
+port: 9000
+
+directories:
+  - name: "Server 0 - Profiles"
+    directory: "C:/OmegaManager/servers/0/profiles"
+    extensions: null
+
+files:
+  - name: "Air Raids"
+    file-name: "AirRaid.txt"
+    directory: "C:/OmegaManager/servers/0/profiles"
+    use-latest-lines: 500
+
+  - name: "Loot Chests"
+    file-name: "LootChests_LOG.txt"
+    directory: "C:/OmegaManager/servers/0/profiles/CJ_LootChests"
+    use-latest-lines: 500
+
+  - name: "Treasure"
+    file-name: "Treasure.txt"
+    directory: "C:/OmegaManager/servers/0/profiles/Treasure"
+    use-latest-lines: 500
+
+  - name: "Code Lock - Access"
+    directory: "C:/OmegaManager/servers/0/profiles/CodeLock/Logs/Access"
+
+  - name: "Code Lock - Attach"
+    directory: "C:/OmegaManager/servers/0/profiles/CodeLock/Logs/Attach"
+
+  - name: "Code Lock - Raid"
+    directory: "C:/OmegaManager/servers/0/profiles/CodeLock/Logs/Raid"
+
+  - name: "Casino"
+    directory: "C:/OmegaManager/servers/0/profiles/DayZCasinoV2"
+    extension: "csv"
+
+  - name: "Expansion"
+    directory: "C:/OmegaManager/servers/0/profiles/ExpansionMod/Logs"
+
+  - name: "Hacking"
+    directory: "C:/OmegaManager/servers/0/profiles/HackingSystemV2/Logs"
+
+  - name: "King of the Hill"
+    directory: "C:/OmegaManager/servers/0/profiles/KOTH/Logs"

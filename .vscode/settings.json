@@ -1,7 +1,29 @@
 {
-  "editor.tabSize": 2,
   "typescript.referencesCodeLens.enabled": true,
   "typescript.implementationsCodeLens.enabled": true,
   "editor.detectIndentation": false,
-  "typescript.preferences.quoteStyle": "single"
+  "typescript.preferences.quoteStyle": "single",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.tabSize": 2, // Set tab width to 2 spaces
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    // Run format/lint actions on save
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.ts": "explicit",
+    "source.organizeImports": "explicit",
+    "source.organizeLinkDefinitions": "explicit",
+    "source.removeUnused.ts": "never",
+    "source.removeUnusedImports": "never",
+    "source.sortImports": "explicit"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib", // Use project-specific TypeScript version
+  "files.eol": "\n", // Enforce Unix-style line endings
+  // "files.insertFinalNewline": true, // Ensure newline at the end of files
+  // "files.trimTrailingWhitespace": true, // Remove trailing whitespace
+  "search.exclude": {
+    "**/node_modules": true, // Exclude node_modules from search
+    "**/dist": true, // Exclude dist/build directories from search
+    "**/.turbo": true, // Exclude Turborepo cache directories
+    "**/coverage": true // Exclude coverage reports
+  }
 }

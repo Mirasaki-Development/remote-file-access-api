@@ -1,108 +1,60 @@
-import { NextFunction, Request, Response } from 'express';
-import { debugLog } from '../debug';
-
-export const UNAUTHORIZED_ERROR = 'UNAUTHORIZED';
-export const RESOURCE_NOT_FOUND_ERROR = 'RESOURCE_NOT_FOUND';
-export const PAGE_NOT_FOUND_ERROR = 'PAGE_NOT_FOUND_ERROR';
-export const TOO_MANY_REQUESTS_ERROR = 'TOO_MANY_REQUESTS';
-export const UNEXPECTED_ERROR_ENCOUNTERED_ERROR = 'UNEXPECTED_ERROR_ENCOUNTERED';
-
-/**
- * Represents an error response that can be returned from our API
- */
-export class ApiError {
-  ok: boolean;
-  code: number;
-  error: string;
-  message: string;
-  body?: object;
-  constructor (
-    code: number,
-    error: string,
-    message: string,
-    body?: object
-  ) {
-    this.ok = false;
-    this.code = code;
-    this.error = error;
-    this.message = message;
-    this.body = body ?? {};
-    debugLog(`ApiError constructed: ${this.error} - ${this.message}`);
-  }
+export enum APIErrorCode {
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  FORBIDDEN = 'FORBIDDEN',
+  NOT_FOUND = 'NOT_FOUND',
+  METHOD_NOT_ALLOWED = 'METHOD_NOT_ALLOWED',
+  BAD_REQUEST = 'BAD_REQUEST',
+  FILE_READ_ERROR = 'FILE_READ_ERROR',
+  DIRECTORY_ACCESS_ERROR = 'DIRECTORY_ACCESS_ERROR',
+  UNSUPPORTED_RESPONSE_TYPE = 'UNSUPPORTED_RESPONSE_TYPE',
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
+  NOT_IMPLEMENTED = 'NOT_IMPLEMENTED',
 }
 
-export interface ApiErrorResponse {
-  ok: false;
-  error: string;
-  message: string;
-  // Allow error response body to be expanded
-  [key: string]: unknown;
-}
-
-/**
- * This apiErrorHandler function
- * be the only place in our application where we
- * define the { error: ... } field to utilize our
- * error handler - notice there is no `next` function,
- * as all requests should stop once an error is determined
- */
-export const apiErrorHandler = (
-  err: Error, 
-  req: Request, 
-  res: Response,
-  // Has to be defined
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _next: NextFunction
-) => {
-  // Expected errors
-  if (err instanceof ApiError) {
-    const body = {
-      ok: false,
-      error: err.message,
-      message: err.message,
-      ...err.body
-    };
-    res.status(err.code).json(body);
-    return;
-  }
-
-  // Unexpected Errors, we should really handle these
-  if (process.env.NODE_ENV !== 'production') {
-    console.error('500 - Internal Server Error encountered:');
-    console.error(err);
-  }
-
-  // Unexpected errors
-  res.status(500).json({
-    ok: false,
-    error: process.env.NODE_ENV === 'production'
-      ? 'Something went wrong on our side, please try again later. This issue has been logged to the developers.'
-      : `[in-dev] Error: ${ err.stack ?? err.message ?? err }`
-  });
+interface APIErrorOptions {
+  code: APIErrorCode;
+  message?: string;
+  status?: number;
+  details?: Record<string, unknown>;
 };
 
-export const unauthorized = () => new ApiError(
-  401,
-  UNAUTHORIZED_ERROR,
-  'Invalid X-API-Key header provided - please authenticate'
-);
+export class APIError extends Error {
+  public readonly code: APIErrorCode;
+  public readonly status: number;
+  public readonly details?: Record<string, unknown>;
 
-export const resourceNotFound = (resourceId: string) => new ApiError(
-  404,
-  RESOURCE_NOT_FOUND_ERROR,
-  `Specified resource ${resourceId} doesn't exist`
-);
+  constructor({ code, message, status, details }: APIErrorOptions) {
+    super(message || code);
+    this.name = 'APIError';
+    this.code = code;
+    this.status = status ?? APIError.mapCodeToStatus(code);
+    this.details = details;
 
-export const pageNotFound = (req: Request) => new ApiError(
-  404,
-  PAGE_NOT_FOUND_ERROR,
-  `The requested page at "${ req.originalUrl }" doesn't exist`
-);
+    Object.setPrototypeOf(this, APIError.prototype);
+  }
 
-export const tooManyRequestsError = (rlHeaders: object) => new ApiError(
-  429,
-  TOO_MANY_REQUESTS_ERROR,
-  'Too many requests',
-  rlHeaders
-);
+  static mapCodeToStatus(code: APIErrorCode): number {
+    switch (code) {
+    case APIErrorCode.UNAUTHORIZED: return 401;
+    case APIErrorCode.FORBIDDEN: return 403;
+    case APIErrorCode.NOT_FOUND: return 404;
+      
+    case APIErrorCode.BAD_REQUEST:
+    case APIErrorCode.FILE_READ_ERROR:
+    case APIErrorCode.DIRECTORY_ACCESS_ERROR:
+    case APIErrorCode.UNSUPPORTED_RESPONSE_TYPE:
+    default: return 500;
+    }
+  }
 
+  toJSON() {
+    return {
+      error: {
+        code: this.code,
+        message: this.message,
+        status: this.status,
+        ...(this.details ? { details: this.details } : {}),
+      },
+    };
+  }
+}

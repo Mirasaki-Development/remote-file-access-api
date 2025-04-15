@@ -1,8 +1,5 @@
-# Our config
-config/config.ts
-
-# Developer TODO =)
-TODO
+# Local Configuration files
+config.yaml
 
 # Logs
 logs

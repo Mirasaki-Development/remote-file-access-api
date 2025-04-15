@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/logo.png" alt="Remote File Access API Logo" height="60" style="border-radius:50px"/></p>
+<p align="center"><img src=".github/markdown-media/logo.png" alt="Remote File Access API Logo" height="60" style="border-radius:50px"/></p>
 <h1 align="center">Remote File Access API</h1>
 <div align='center'>
 

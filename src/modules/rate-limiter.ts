@@ -1,6 +1,6 @@
 import { RateLimiterMemory } from 'rate-limiter-flexible';
-import { tooManyRequestsError } from './api-errors';
-import { debugLog } from '../debug';
+import { APIError, APIErrorCode } from './api-errors';
+import { Logger } from '../logger';
 
 /**
  * Block Strategy against really powerful DDoS attacks (like 100k requests per sec)
@@ -8,7 +8,7 @@ import { debugLog } from '../debug';
  */
 export const shortBurstRateLimiter = new RateLimiterMemory({
   points: 100,
-  duration: 1
+  duration: 1,
 });
 
 const rateLimiterMiddleware = (limiter) => {
@@ -17,7 +17,7 @@ const rateLimiterMiddleware = (limiter) => {
       .then(({
         remainingPoints,
         msBeforeNext,
-        consumedPoints
+        consumedPoints,
         // isFirstInDuration
       }) => {
         const rlHeaders = {
@@ -25,35 +25,32 @@ const rateLimiterMiddleware = (limiter) => {
           'X-RateLimit-Limit': limiter._points,
           'X-RateLimit-Remaining': remainingPoints,
           'X-RateLimit-Consumed': consumedPoints,
-          'X-RateLimit-Reset': new Date(Date.now() + msBeforeNext)
+          'X-RateLimit-Reset': new Date(Date.now() + msBeforeNext),
         };
         res.set(rlHeaders);
         next();
-        debugLog('Rate limit headers for IP:', rlHeaders);
+        Logger.debug('Rate limit headers for IP:', rlHeaders);
       })
       .catch(({
         remainingPoints,
         msBeforeNext,
-        consumedPoints
+        consumedPoints,
       }) => {
         const rlHeaders = {
           'Retry-After': msBeforeNext / 1000,
           'X-RateLimit-Limit': limiter._points,
           'X-RateLimit-Remaining': remainingPoints,
           'X-RateLimit-Consumed': consumedPoints,
-          'X-RateLimit-Reset': new Date(Date.now() + msBeforeNext)
+          'X-RateLimit-Reset': new Date(Date.now() + msBeforeNext),
         };
         res.set(rlHeaders);
-        // Manually handle error - don't use next(...)
-        const error = tooManyRequestsError(rlHeaders);
-        res.status(error.code).json({
-          ok: false,
-          rid: res.locals.rid,
-          error: error.error,
-          message: error.message,
-          ...error.body
-        });
-        debugLog('Rate limit reached for IP:', rlHeaders);
+        next(new APIError({
+          code: APIErrorCode.FORBIDDEN,
+          message: 'Rate limit reached',
+          status: 429,
+          details: rlHeaders,
+        }));
+        Logger.debug('Rate limit reached for IP:', rlHeaders);
         return;
       });
   };

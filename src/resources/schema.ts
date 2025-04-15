@@ -172,7 +172,7 @@ const resourceSchema = z.object({
   'cache-control': cacheControlPolicySchema.optional().nullable().default(null),
   /**
    * Fine-grained permissions for this resource. If not specified, the resource
-   * is accessible to all clients with the `master-api-key`.
+   * is accessible to all clients using the `master-api-key`.
    */
   permissions: z.array(permissionsSchema).optional().nullable().default(null),
 });
@@ -180,6 +180,7 @@ const resourceSchema = z.object({
 const configSchema = z.object({
   /**
    * Strong "password-like" which allows access to **all** endpoints/resources
+   * which do not have fine-grained permissions defined.
    *
    * Note: This is not a password, but an API key. Clients authenticate with
    * the API by sending this key in the `x-api-key` header.

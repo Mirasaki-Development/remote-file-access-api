@@ -18,6 +18,10 @@
 
 - [DEV]
 
+## ⚙️ Configuration
+
+## 🤝 Contributing
+
 ## ⭐ Credits and Attribution
 
 - Logo by [Flaticon](https://www.flaticon.com/free-icons/distance-education)

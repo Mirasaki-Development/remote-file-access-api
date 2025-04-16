@@ -1,0 +1,21 @@
+services:
+  api:
+    container_name: navi-fs-api
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+    ports:
+      - 9000:9000
+    networks:
+      - navi-fs-network
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./logs:/app/logs:rw
+      # You have to create volumes for all the resources you want to mount
+      # - /home/mirasaki/projects/navi-fs:/app/resources/navi-fs:rw
+
+networks:
+  navi-fs-network:

@@ -37,12 +37,50 @@ const responseTypes = [
 
 type ResponseType = typeof responseTypes[number];
 
+const sizeLimitUnit = z.enum(['bytes', 'lines', 'files']);
+
 // [DEV] Implement size policy
 const sizePolicySchema = z.object({
-  'max-lines': z.number().optional(),
-  'per-file': z.number().optional(),
-  'max-bytes': z.number().optional(),
-}).strict();
+  /**
+   * The type of size limit being applied.
+   * @example "bytes"
+   */
+  unit: sizeLimitUnit,
+  /**
+   * The numeric threshold for the given unit.
+   * @example 1048576 // 1 MB
+   */
+  limit: z.number().int().positive(),
+
+  /**
+   * Optional: Applies only to specific file extensions.
+   * If omitted, applies to all.
+   * @example [".log", ".json"]
+   */
+  extensions: z.array(z.string()).optional(),
+
+  /**
+   * Optional: Applies only to files matching this regex pattern.
+   * Can be used for more advanced filtering.
+   */
+  pattern: z.string().regex(/.*/).optional(),
+
+  /**
+   * Optional: Controls whether to truncate or reject oversized files.
+   * - "truncate" = include only up to the limit
+   * - "reject" = skip the file completely
+   * - "warn" = include but log warning (dev mode)
+   * @default "truncate"
+   */
+  mode: z.enum(['truncate', 'reject', 'warn']).optional().default('truncate'),
+
+  /**
+   * Optional: Whether to apply size limit cumulatively across all files.
+   * If false, size is checked per file.
+   * @default false
+   */
+  cumulative: z.boolean().optional().default(false),
+});
 
 export const cacheControlPolicySchema = z.object({
   /**
@@ -137,6 +175,58 @@ const permissionsSchema = z.object({
   'api-key': z.string().min(32).max(256).refine(preventDefaultApiKey, { message: defaultApiKeyMessage }),
 });
 
+const executableSchema = z.object({
+  /**
+   * The command to run when the resource is executed.
+   * This can be a shell command, a script, or a binary.
+   * The command will be executed in the context of the resource.
+   * @example "python3 script.py"
+   */
+  command: z.string().min(1),
+  /**
+   * The arguments to pass to the command.
+   * This can be a string or an array of strings.
+   * @example ["arg1", "arg2"]
+   * @default []
+   */
+  args: z.union([z.string(), z.array(z.string())]).optional().default([]),
+  /**
+   * The working directory to run the command in.
+   * @example "path/to/working/directory"
+   * @default "."
+   */
+  cwd: z.string().optional(),
+  /**
+   * The environment variables to set when running the command.
+   * @example { "ENV_VAR": "value" }
+   * @default {}
+   */
+  env: z.record(z.string()).optional().default({}),
+  /**
+   * Whether or not the environment variables from this running process should
+   * be copied over to the command.
+   * @default false
+   */
+  'inject-current-env': z.boolean().optional().default(false),
+  /**
+   * Determines how long to wait for the command to finish before timing out.
+   * This can be useful for long-running commands or scripts.
+   * @default 600 // 10 minutes
+   */
+  timeout: z.number().int().positive().optional().default(600),
+  /**
+   * Determines if the command should be run in the background or not.
+   * If true, the command will be run in a detached process.
+   * @default false
+   */
+  detached: z.boolean().optional().default(false),
+  /**
+   * The shell to use when running the command.
+   * @example "bash"
+   */
+  shell: z.string().optional().default('/bin/bash'),
+});
+
 const resourceSchema = z.object({
   /**
    * The unique identifier for this resource.
@@ -161,9 +251,9 @@ const resourceSchema = z.object({
    */
   extensions: z.union([z.array(z.string()), z.null()]).optional().nullable().default(null),
   /**
-   * An (optional) policy that determines size constraints for the response.
+   * Determines size constraints/limits for this resource.
    */
-  'size-policy': sizePolicySchema.nullable().optional().default(null),
+  'size-policy': z.union([sizePolicySchema, z.array(sizePolicySchema).max(10)]).optional().nullable().default(null),
   /**
    * Defines HTTP caching behavior for the resource. This configuration is
    * used to generate the `Cache-Control` header, which instructs the client
@@ -175,6 +265,11 @@ const resourceSchema = z.object({
    * is accessible to all clients using the `master-api-key`.
    */
   permissions: z.array(permissionsSchema).optional().nullable().default(null),
+  /**
+   * Determines if the resource is or has an executable, and how that executable
+   * should be handled.
+   */
+  executable: executableSchema.optional().nullable().default(null),
 });
 
 const configSchema = z.object({
@@ -218,8 +313,9 @@ const configSchema = z.object({
 });
 
 type Config = z.infer<typeof configSchema>;
+type Executable = z.infer<typeof executableSchema>;
 
 type CacheControlPolicy = z.infer<typeof cacheControlPolicySchema>;
 
-export { CacheControlPolicy, Config, configSchema, resourceSchema, ResponseType, responseTypes };
+export { CacheControlPolicy, Config, configSchema, Executable, resourceSchema, ResponseType, responseTypes };
 

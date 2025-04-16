@@ -1,3 +1,4 @@
+import { spawn } from 'child_process';
 import { createHash } from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import { createReadStream } from 'fs';
@@ -251,6 +252,13 @@ class ResourceHandler {
 
     typedResponse(res, {
       data: relativePaths,
+      meta: {
+        slug: resource.slug,
+        query,
+        currentLocation,
+        recursive,
+        responseType,
+      },
     });
   };
 
@@ -348,28 +356,33 @@ class ResourceHandler {
     res.status(204).end();
   };
 
-  private readonly handleExecuteRequest = async (
+  private readonly handleExecuteSSERequest = async (
     resource: ParsedResource,
-    query: {
-      currentLocation: string;
-      cmd: string;
-      args: string[];
-      env: Record<string, string>;
-      cwd: string;
-      timeout: number;
-      detached: boolean;
-      shell: string;
-    },
+    query: { currentLocation: string },
     req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
-    const { currentLocation, cmd, args, env, cwd, timeout, detached, shell } = query;
-
-    Logger.debug(`[EXECUTE] Resource found: ${resource.slug}`, resource, {
+    if (!resource.executable) {
+      return next(new APIError({
+        code: APIErrorCode.BAD_REQUEST,
+        message: 'Invalid request',
+        status: 400,
+        details: {
+          slug: resource.slug,
+          query,
+          error: 'The resource is not executable',
+        },
+      }));
+    }
+  
+    const { currentLocation } = query;
+    const { command, args, env, cwd, timeout, detached, shell } = resource.executable;
+  
+    Logger.debug(`[EXECUTE:SSE] Running command: ${resource.slug}`, resource, {
       query,
       currentLocation,
-      cmd,
+      command,
       args,
       env,
       cwd,
@@ -378,16 +391,50 @@ class ResourceHandler {
       shell,
     });
 
-    next(new APIError({
-      code: APIErrorCode.NOT_IMPLEMENTED,
-      message: 'Execute command not implemented',
-      status: 501,
-      details: {
-        slug: resource.slug,
-        query,
-        error: 'Execute command not implemented',
-      },
-    }));
+    const sendEvent = (type: string, data: string) => {
+      res.write(`event: ${type}\n`);
+      res.write(`data: ${data.replace(/\n/g, '\ndata: ')}\n\n`);
+    };
+  
+    try {
+      const child = spawn(command, Array.isArray(args) ? args : [args], {
+        cwd,
+        env: {
+          ...(resource.executable['inject-current-env'] ? process.env : {}),
+          ...env,
+        },
+        shell,
+        detached,
+        timeout,
+      });
+  
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.flushHeaders();
+  
+      child.stdout.on('data', (chunk) => {
+        sendEvent('stdout', chunk.toString());
+      });
+  
+      child.stderr.on('data', (chunk) => {
+        sendEvent('stderr', chunk.toString());
+      });
+  
+      child.on('close', (code) => {
+        sendEvent('exit', `Process exited with code ${code}`);
+        res.end();
+      });
+  
+      child.on('error', (err) => {
+        sendEvent('error', err.message);
+        res.end();
+      });
+    } catch (error) {
+      Logger.error('[EXECUTE:SSE] Failed', error);
+      sendEvent('error', 'Failed to execute command');
+      res.end();
+    }
   };
 
   public readonly handleRequest = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -448,12 +495,8 @@ class ResourceHandler {
       }, req, res, next);
     }
 
-    // [DEV] Implement logic for executing file commands
-    // Consider having an `executable` property on the resource,
-    // and check if the file is executable before executing it (using `fs.access`).
     if (req.method === 'EXECUTE') {
-      // @ts-expect-error - Execute has not been implemented yet
-      return await this.handleExecuteRequest(resource, {
+      return await this.handleExecuteSSERequest(resource, {
         currentLocation,
       }, req, res, next);
     }

@@ -22,7 +22,7 @@ export const main = async () => {
   app.use(router);
 
   app.listen(appConfig.port, () => {
-    Logger.info(`[Remote File Access API] Listening on port ${appConfig.port}`);
+    Logger.info(`[NaviFS] Listening on port ${appConfig.port}`);
     const msSinceStart = (process.hrtime(start)[1] / Magic.MS_IN_ONE_NS).toFixed(2);
     Logger.debug(`Listening on port ${appConfig.port} after ${msSinceStart}ms`);
   });

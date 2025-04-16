@@ -7,6 +7,11 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - 9000:9000
     networks:

@@ -4,7 +4,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { createReadStream } from 'fs';
 import { stat } from 'fs/promises';
 import path from 'path';
-import { Logger } from '../logger';
+import { logger } from '../logger';
 import { APIError, APIErrorCode } from '../modules/api-errors';
 import { typedResponse } from '../response';
 import { ParsedResource, ResourceParser } from './parser';
@@ -90,7 +90,7 @@ class ResourceHandler {
 
     fileStream.pipe(res);
     fileStream.on('error', (err) => {
-      Logger.error('Error streaming file:', err);
+      logger.error('Error streaming file:', err);
       next(new APIError({
         code: APIErrorCode.INTERNAL_ERROR,
         message: 'Error streaming file',
@@ -161,7 +161,7 @@ class ResourceHandler {
     const currentIsFile = stats.isFile();
     const directoryResourceIsInFile = resource.type === 'directory' && currentIsFile;
 
-    Logger.debug(`[GET] Resource found: ${resource.slug}`, resource, {
+    logger.debug(`[GET] Resource found: ${resource.slug}`, resource, {
       query,
       recursive,
       responseType,
@@ -245,7 +245,7 @@ class ResourceHandler {
     const absolutePaths = await ResourceUtils.listFiles(currentLocation, recursive, resource.extensions ?? []);
     const relativePaths = absolutePaths.map((filePath) => path.relative(currentLocation, filePath));
 
-    Logger.debug(`Resolving (route) options for: ${resource.slug}`, {
+    logger.debug(`Resolving (route) options for: ${resource.slug}`, {
       absolutePaths,
       relativePaths,
     });
@@ -290,7 +290,7 @@ class ResourceHandler {
       return;
     }
 
-    Logger.debug(`[POST] Resource found: ${resource.slug}`, resource, {
+    logger.debug(`[POST] Resource found: ${resource.slug}`, resource, {
       query,
       currentLocation,
       currentIsFile,
@@ -344,7 +344,7 @@ class ResourceHandler {
       return;
     }
 
-    Logger.debug(`[DELETE] Resource found: ${resource.slug}`, resource, {
+    logger.debug(`[DELETE] Resource found: ${resource.slug}`, resource, {
       query,
       currentLocation,
       currentIsFile,
@@ -379,7 +379,7 @@ class ResourceHandler {
     const { currentLocation } = query;
     const { command, args, env, cwd, timeout, detached, shell } = resource.executable;
   
-    Logger.debug(`[EXECUTE:SSE] Running command: ${resource.slug}`, resource, {
+    logger.debug(`[EXECUTE:SSE] Running command: ${resource.slug}`, resource, {
       query,
       currentLocation,
       command,
@@ -431,7 +431,7 @@ class ResourceHandler {
         res.end();
       });
     } catch (error) {
-      Logger.error('[EXECUTE:SSE] Failed', error);
+      logger.error('[EXECUTE:SSE] Failed', error);
       sendEvent('error', 'Failed to execute command');
       res.end();
     }

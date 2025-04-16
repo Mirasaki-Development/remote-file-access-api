@@ -1,6 +1,6 @@
 import path from 'path';
+import { logger } from '../logger';
 import appConfig, { validateConfig } from './config';
-import { Logger } from '../logger';
 import { ResourceUtils } from './utils';
 
 const _resources = appConfig.resources ?? [];
@@ -42,7 +42,7 @@ class ResourceValidator {
 
     const isDirectory = await ResourceUtils.isDirectory(target);
 
-    Logger.debug(`Resource "${slug}" data: ${target}`, {
+    logger.debug(`Resource "${slug}" data: ${target}`, {
       type: isDirectory ? 'directory' : 'file',
       slug,
       target,
@@ -53,12 +53,12 @@ class ResourceValidator {
       if (extensions === null || extensions.length < 1) {
         const hasFiles = await ResourceUtils.hasFiles(target, true);
         if (!hasFiles) {
-          Logger.warn(`Resource "${slug}" has no files in the target directory: ${target}`);
+          logger.warn(`Resource "${slug}" has no files in the target directory: ${target}`);
         }
       } else {
         const hasFiles = await ResourceUtils.hasFiles(target, true, extensions);
         if (!hasFiles) {
-          Logger.warn(`Resource "${slug}" has no files with the specified extensions`);
+          logger.warn(`Resource "${slug}" has no files with the specified extensions`);
         }
       }
     } else {
@@ -67,7 +67,7 @@ class ResourceValidator {
       const fileNameWithoutExtension = fileExtension ? path.basename(fileName, fileExtension) : fileName;
       const fileNameHasExtension = fileNameWithoutExtension !== fileName;
 
-      Logger.debug(`Resource "${slug}" file data`, {
+      logger.debug(`Resource "${slug}" file data`, {
         fileName,
         fileNameWithoutExtension,
         fileNameHasExtension,
@@ -75,11 +75,11 @@ class ResourceValidator {
       });
   
       if (fileNameHasExtension && !await ResourceUtils.checkFileExists(target)) {
-        Logger.warn(`Resource "${slug}" file does not exist: ${target}`);
+        logger.warn(`Resource "${slug}" file does not exist: ${target}`);
       } else if (!fileNameHasExtension) {
         if (extensions === null || extensions.length < 1) {
           if (!await ResourceUtils.hasFiles(target, true)) {
-            Logger.warn(`Resource "${slug}" has no files in the target directory: ${target}`);
+            logger.warn(`Resource "${slug}" has no files in the target directory: ${target}`);
           }
         } else {
           const anyExists = await Promise.all(
@@ -89,7 +89,7 @@ class ResourceValidator {
           ).then((results) => results.some((exists) => exists));
     
           if (!anyExists) {
-            Logger.warn(`Resource "${slug}" has no file with the specified extensions`);
+            logger.warn(`Resource "${slug}" has no file with the specified extensions`);
           }
         }
       }
@@ -156,7 +156,5 @@ class ResourceParser {
   readonly targets = this.resources.map((resource) => resource.target);
 }
 
-export {
-  ResourceParser,
-  type ParsedResource,
-};
+export { ResourceParser, type ParsedResource };
+

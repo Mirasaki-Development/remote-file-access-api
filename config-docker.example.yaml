@@ -1,5 +1,5 @@
 port: 9000
-log-level: debug
+log-level: info
 master-api-key: __REPLACE_WITH_A_STRONG_API_KEY__
 
 resources:

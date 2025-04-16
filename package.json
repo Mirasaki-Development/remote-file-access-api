@@ -13,6 +13,8 @@
     "start": "NODE_ENV=production node dist/src/index.js >> logs/app.log 2>&1",
     "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/index.ts",
     "pretest": "npm run build",
+    "setup:linux": "npm install && cp config.example.yaml config.yaml",
+    "setup:windows": "npm install && copy config.example.yaml config.yaml",
     "test": "mocha dist/test/**/*.js",
     "test:dev": "ts-mocha test/**/*.spec.ts -w --watch-files '**/*.ts'",
     "typecheck": "tsc --noEmit",

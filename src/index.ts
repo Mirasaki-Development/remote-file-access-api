@@ -1,7 +1,8 @@
 import rTracer from 'cls-rtracer';
 import compression from 'compression';
 import express from 'express';
-import { Logger } from './logger';
+import pinoHttp from 'pino-http';
+import { logger } from './logger';
 import Magic from './magic';
 import rateLimiterMiddleware, { shortBurstRateLimiter } from './modules/rate-limiter';
 import appConfig from './resources/config';
@@ -16,15 +17,21 @@ export const main = async () => {
 
   await ResourceHandler.getInstance();
 
+  app.use(pinoHttp({
+    autoLogging: true,
+    level: appConfig['log-level'],
+    genReqId: () => rTracer.id,
+    logger,
+  }));
   app.use(compression({ filter: compressionFilter }));
   app.use(rTracer.expressMiddleware());
   app.use(rateLimiterMiddleware(shortBurstRateLimiter));
   app.use(router);
 
   app.listen(appConfig.port, () => {
-    Logger.info(`[NaviFS] Listening on port ${appConfig.port}`);
+    logger.info(`[NaviFS] Listening on port ${appConfig.port}`);
     const msSinceStart = (process.hrtime(start)[1] / Magic.MS_IN_ONE_NS).toFixed(2);
-    Logger.debug(`Listening on port ${appConfig.port} after ${msSinceStart}ms`);
+    logger.debug(`Listening on port ${appConfig.port} after ${msSinceStart}ms`);
   });
 };
 

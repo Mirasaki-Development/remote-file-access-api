@@ -1,5 +1,5 @@
 import { Router, type NextFunction, type Request, type Response } from 'express';
-import { Logger } from '../logger';
+import { logger } from '../logger';
 import { APIError } from '../modules/api-errors';
 import { typedResponse } from '../response';
 import v1Router from './v1/routes';
@@ -12,7 +12,7 @@ router.get('/', (req, res) => {
       status: 'alive',
     },
   });
-  Logger.debug('Received status request: alive');
+  logger.debug('Received status request: alive');
 });
 
 router.use('/api/v1', v1Router);

@@ -1,7 +1,7 @@
 import { constants } from 'fs';
 import { access, readdir, readFile, rm, stat, writeFile } from 'fs/promises';
 import path from 'path';
-import { Logger } from '../logger';
+import { logger } from '../logger';
 import { ResponseType, responseTypes } from './schema';
 
 interface ResourceMeta {
@@ -30,7 +30,7 @@ class ResourceUtils {
       await access(filePath, constants.F_OK);
       return true;
     } catch (error) {
-      Logger.debug(`File does not exist: ${filePath}`, error);
+      logger.debug(`File does not exist: ${filePath}`, error);
       return false;
     }
   }
@@ -95,7 +95,7 @@ class ResourceUtils {
       const stats = await stat(filePath);
       return stats.isDirectory();
     } catch (error) {
-      Logger.debug(`Path is not a directory: ${filePath}`, error);
+      logger.debug(`Path is not a directory: ${filePath}`, error);
       return false;
     }
   }
@@ -171,7 +171,7 @@ class ResourceUtils {
 
       return results.flat();
     } catch (error) {
-      Logger.debug(`Error listing files in directory: ${directoryPath}`, error);
+      logger.debug(`Error listing files in directory: ${directoryPath}`, error);
       return [];
     }
   }
@@ -202,7 +202,7 @@ class ResourceUtils {
         },
       };
     } catch (error) {
-      Logger.debug(`Error reading file: ${filePath}`, error);
+      logger.debug(`Error reading file: ${filePath}`, error);
       throw error;
     }
   }
@@ -247,7 +247,7 @@ class ResourceUtils {
       const { encoding = 'utf-8' } = options;
       await writeFile(filePath, data, { encoding });
     } catch (error) {
-      Logger.debug(`Error writing file: ${filePath}`, error);
+      logger.debug(`Error writing file: ${filePath}`, error);
       throw error;
     }
   }
@@ -259,7 +259,7 @@ class ResourceUtils {
     try {
       await rm(filePath, { force: true, recursive: type === 'directory' });
     } catch (error) {
-      Logger.debug(`Error deleting file: ${filePath}`, error);
+      logger.debug(`Error deleting file: ${filePath}`, error);
       throw error;
     }
   }

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import yaml from 'js-yaml';
-import { Logger } from '../logger';
+import { logger } from '../logger';
 import Magic from '../magic';
 import { configSchema } from './schema';
 
@@ -46,7 +46,7 @@ export const appConfig = resolveAppConfig();
 export const validateConfig = () => {
   // Warn insecure api key
   if ((appConfig['master-api-key']?.length ?? 0) < Magic.RECOMMENDED_API_KEY_LENGTH) {
-    Logger.warn([
+    logger.warn([
       '[Configuration] "api-key" should be at least 128 characters.',
       '  ↳ This security measure is in place to protect your information/privacy',
     ].join('\n'));
@@ -58,18 +58,18 @@ export const validateConfig = () => {
     || appConfig.port < 0
     || appConfig.port > Magic.VALID_PORT_RANGE_MAX
   ) {
-    Logger.error(`[Configuration] "port" is not in range 0-${Magic.VALID_PORT_RANGE_MAX}`);
+    logger.error(`[Configuration] "port" is not in range 0-${Magic.VALID_PORT_RANGE_MAX}`);
     process.exit(1);
   }
 
   // After validating port, warn about reserved well-known ports
   if (appConfig.port <= Magic.WELL_KNOWN_PORT_RANGE) {
-    Logger.warn(`[Configuration] "port" is in the reserved well-known ports range of 0-${Magic.WELL_KNOWN_PORT_RANGE}`);
+    logger.warn(`[Configuration] "port" is in the reserved well-known ports range of 0-${Magic.WELL_KNOWN_PORT_RANGE}`);
   }
 
   // After validating port, warn about reserved Ephemeral Ports
   if (appConfig.port >= Magic.EPHEMERAL_PORT_RANGE_START) {
-    Logger.warn(`[Configuration] "port" is in the reserved Ephemeral Port range of 0-${Magic.WELL_KNOWN_PORT_RANGE}`);
+    logger.warn(`[Configuration] "port" is in the reserved Ephemeral Port range of 0-${Magic.WELL_KNOWN_PORT_RANGE}`);
   }
 };
 

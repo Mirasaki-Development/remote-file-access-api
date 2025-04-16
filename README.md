@@ -135,7 +135,7 @@ Basic health check. No authentication required.
 
 Retrieves file contents or lists directory contents.
 
-**Query Parameters:**
+**Query Parameters (optional):**
 
 - `cursor` – Subpath relative to resource root.
 - `type` – Output format: `stream`, `json`, `text`, `html`, `xml`, `csv`, `yaml`, `toml`
@@ -170,7 +170,7 @@ Retrieves file contents or lists directory contents.
 
 Writes to a file.
 
-**Query Parameters:**
+**Query Parameters (optional):**
 
 - `cursor` – Path of file to write to.
 - `encoding` – Optional, e.g. `utf-8`, `base64`, etc.
@@ -197,7 +197,7 @@ Plain string content to be written to file.
 
 Deletes a file or directory.
 
-**Query Parameters:**
+**Query Parameters (optional):**
 
 - `cursor` – Path to target file or directory.
 - `force` – Required to delete directories.
@@ -220,7 +220,7 @@ Deletes a file or directory.
 
 Executes a command via SSE (Server-Sent Events).
 
-**Query Parameters:**
+**Query Parameters (optional):**
 
 - `cursor` – Optional execution path override.
 
@@ -231,7 +231,7 @@ Executes a command via SSE (Server-Sent Events).
 
 **Behavior:**
 
-- Only allowed for resources marked `"executable": true`.
+- Only allowed for resources that have an `executable` configuration defined.
 - Streams `stdout`, `stderr`, `exit`, and `error` events.
 
 **Response Format (SSE):**
